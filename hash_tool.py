@@ -77,7 +77,7 @@ def compute_text_hash(text: str, algorithm: str = "sha256") -> str:
     return hash_func.hexdigest()
 
 
-def generate_hash_file(file_path: str, algorithm: str = "sha256") -> str:
+def generate_hash_file(file_path: str, algorithm: str = "sha256", verbose: bool = True) -> str:
     """
     Generate a hash for a file and save it in standard checksum format (<hash>  <filename>)
     to a companion file (e.g. filename.ext.sha256). Returns the created checksum file path.
@@ -88,12 +88,13 @@ def generate_hash_file(file_path: str, algorithm: str = "sha256") -> str:
     with open(hash_file_path, "w", encoding="utf-8") as f:
         f.write(f"{digest}  {os.path.basename(file_path)}\n")
 
-    print(f"[+] {algorithm.upper()} hash saved to: {hash_file_path}")
-    print(f"    {digest}")
+    if verbose:
+        print(f"[+] {algorithm.upper()} hash saved to: {hash_file_path}")
+        print(f"    {digest}")
     return hash_file_path
 
 
-def verify_file(file_path: str, expected_hash: str, algorithm: str = "sha256") -> bool:
+def verify_file(file_path: str, expected_hash: str, algorithm: str = "sha256", verbose: bool = True) -> bool:
     """
     Verify a file's integrity against an expected hash string.
     """
@@ -106,19 +107,20 @@ def verify_file(file_path: str, expected_hash: str, algorithm: str = "sha256") -
 
     match = actual_clean == expected_clean
 
-    print(f"File     : {file_path}")
-    print(f"Algorithm: {algorithm.upper()}")
-    print(f"Expected : {expected_clean}")
-    print(f"Actual   : {actual_clean}")
-    if match:
-        print("[OK] MATCH -- file integrity verified.")
-    else:
-        print("[MISMATCH] -- file may be corrupted or tampered with.")
+    if verbose:
+        print(f"File     : {file_path}")
+        print(f"Algorithm: {algorithm.upper()}")
+        print(f"Expected : {expected_clean}")
+        print(f"Actual   : {actual_clean}")
+        if match:
+            print("[OK] MATCH -- file integrity verified.")
+        else:
+            print("[MISMATCH] -- file may be corrupted or tampered with.")
 
     return match
 
 
-def verify_from_hash_file(file_path: str, hash_file_path: str, algorithm: str = "sha256") -> bool:
+def verify_from_hash_file(file_path: str, hash_file_path: str, algorithm: str = "sha256", verbose: bool = True) -> bool:
     """
     Verify a file using a companion checksum file.
     """
@@ -136,7 +138,7 @@ def verify_from_hash_file(file_path: str, hash_file_path: str, algorithm: str = 
     if not is_valid_hash(expected_hash, algorithm):
         raise ValueError(f"Invalid checksum file format: '{hash_file_path}' does not contain a valid hash digest.")
 
-    return verify_file(file_path, expected_hash, algorithm)
+    return verify_file(file_path, expected_hash, algorithm, verbose=verbose)
 
 
 def hash_directory(dir_path: str, algorithm: str = "sha256") -> dict:

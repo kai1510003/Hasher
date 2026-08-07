@@ -52,22 +52,22 @@ class TestHashTool(unittest.TestCase):
 
     def test_verify_file_success(self):
         expected_sha256 = compute_text_hash(self.sample_text, "sha256")
-        self.assertTrue(verify_file(self.sample_file, expected_sha256, "sha256"))
+        self.assertTrue(verify_file(self.sample_file, expected_sha256, "sha256", verbose=False))
 
     def test_verify_file_mismatch(self):
         mismatch_sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
-        self.assertFalse(verify_file(self.sample_file, mismatch_sha256, "sha256"))
+        self.assertFalse(verify_file(self.sample_file, mismatch_sha256, "sha256", verbose=False))
 
     def test_verify_file_invalid_hash_format(self):
         with self.assertRaises(ValueError):
-            verify_file(self.sample_file, "invalid_hash", "sha256")
+            verify_file(self.sample_file, "invalid_hash", "sha256", verbose=False)
 
     def test_generate_and_verify_hash_file(self):
-        created_path = generate_hash_file(self.sample_file, "sha256")
+        created_path = generate_hash_file(self.sample_file, "sha256", verbose=False)
         expected_path = f"{self.sample_file}.sha256"
         self.assertEqual(created_path, expected_path)
         self.assertTrue(os.path.exists(created_path))
-        self.assertTrue(verify_from_hash_file(self.sample_file, created_path, "sha256"))
+        self.assertTrue(verify_from_hash_file(self.sample_file, created_path, "sha256", verbose=False))
 
     def test_verify_from_invalid_checksum_file(self):
         # Create a non-checksum file with arbitrary content
@@ -198,6 +198,7 @@ class TestHashTool(unittest.TestCase):
             self.assertTrue(res["success"])
             self.assertFalse(res["found"])
             self.assertIn("not found", res["error"].lower())
+        err.close()
 
     def test_vt_upload_file(self):
         from unittest.mock import patch, MagicMock
